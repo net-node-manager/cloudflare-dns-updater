@@ -6,9 +6,7 @@ def get_clean_ips():
     try:
         response = requests.get(url, timeout=15)
         if response.status_code == 200:
-            # پیدا کردن آی‌پی‌های واقعی از بین متن‌ها
             ips = re.findall(r'\d+\.\d+\.\d+\.\d+', response.text)
-            # ذخیره کردن ۲۰ آی‌پی اول که سالم هستند
             with open('list.txt', 'w') as f:
                 f.write('\n'.join(ips[:20]))
             print("Successfully updated list.txt with new IPs")
