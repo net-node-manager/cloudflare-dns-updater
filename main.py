@@ -1,17 +1,19 @@
 import requests
+import re
 
-def update_ips():
-    # Source of filtered IPs for Iran
+def get_clean_ips():
     url = "https://raw.githubusercontent.com/vfarid/cf-clean-ips/main/list.txt"
     try:
-        r = requests.get(url)
-        # Get first 30 healthy IPs
-        ips = [line.split(' ')[0] for line in r.text.split('\n') if line.strip()]
-        with open('list.txt', 'w') as f:
-            f.write('\n'.join(ips[:30]))
-        print("Success: list.txt updated with clean IPs.")
-    except:
-        print("Error: Could not fetch IPs.")
+        response = requests.get(url, timeout=15)
+        if response.status_code == 200:
+            # پیدا کردن آی‌پی‌های واقعی از بین متن‌ها
+            ips = re.findall(r'\d+\.\d+\.\d+\.\d+', response.text)
+            # ذخیره کردن ۲۰ آی‌پی اول که سالم هستند
+            with open('list.txt', 'w') as f:
+                f.write('\n'.join(ips[:20]))
+            print("Successfully updated list.txt with new IPs")
+    except Exception as e:
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
-    update_ips()
+    get_clean_ips()
