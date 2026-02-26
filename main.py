@@ -1,28 +1,18 @@
-name: Hourly DNS Update
-on:
-  schedule:
-    - cron: '0 * * * *'
-  workflow_dispatch:
+import requests
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-      - name: Install dependencies
-        run: pip install requests
-      - name: Run Scanner
-        run: python main.py
-      - name: Commit and Push
-        run: |
-          git config --global user.name 'net-node-manager'
-          git config --global user.email 'bot@net-node-manager.studio'
-          git add list.txt
-          git commit -m "Automated IP update" || exit 0
-          git push
+def get_ips():
+    url = "https://raw.githubusercontent.com/vfarid/cf-clean-ips/main/list.txt"
+    try:
+        r = requests.get(url)
+        # Filtering top 20 stable IPs
+        ips = [l.split(' ')[0] for l in r.text.split('\n') if l]
+        return ips[:20]
+    except:
+        return []
+
+if __name__ == "__main__":
+    clean_ips = get_ips()
+    if clean_ips:
+        with open('list.txt', 'w') as f:
+            f.write('\n'.join(clean_ips))
+        print("Done: list.txt created.")
