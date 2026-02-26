@@ -5,11 +5,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-updater:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -19,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Run IP Scanner
+      - name: Run Script
         run: python main.py
 
       - name: Commit and Push Changes
